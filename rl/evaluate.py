@@ -18,6 +18,7 @@ from typing import Optional, List, Dict
 import numpy as np
 
 from stable_baselines3 import PPO
+from sb3_contrib import MaskablePPO
 
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -232,10 +233,14 @@ def main():
 
     args = parser.parse_args()
 
-    # Load model
+    # Load model (try MaskablePPO first, fall back to PPO)
     print(f"Loading model from {args.model}...")
-    model = PPO.load(args.model)
-    print("Model loaded.\n")
+    try:
+        model = MaskablePPO.load(args.model)
+        print("Model loaded (MaskablePPO).\n")
+    except Exception:
+        model = PPO.load(args.model)
+        print("Model loaded (PPO).\n")
 
     if args.puzzle:
         # Evaluate on specific puzzle
