@@ -38,9 +38,13 @@ def evaluate_on_puzzle(
     Returns:
         Dict with 'solved', 'steps', 'reward', 'actions'
     """
+    # Check if model is MaskablePPO
+    is_maskable = isinstance(model, MaskablePPO)
+
     env = LaserMazeEnv(
         puzzle_path=puzzle_path,
         max_steps=max_steps,
+        use_action_mask=is_maskable,
     )
 
     obs, info = env.reset()
@@ -59,7 +63,11 @@ def evaluate_on_puzzle(
     step = 0
 
     while True:
-        action, _ = model.predict(obs, deterministic=True)
+        if is_maskable:
+            action_mask = env.action_masks()
+            action, _ = model.predict(obs, deterministic=True, action_masks=action_mask)
+        else:
+            action, _ = model.predict(obs, deterministic=True)
         decoded = env.game._decode_action(int(action))
 
         obs, reward, terminated, truncated, info = env.step(int(action))
@@ -112,10 +120,13 @@ def evaluate_random(
     Returns:
         Dict with aggregated statistics
     """
+    is_maskable = isinstance(model, MaskablePPO)
+
     env = LaserMazeEnv(
         random_puzzles=True,
         puzzle_difficulty=difficulty,
         max_steps=max_steps,
+        use_action_mask=is_maskable,
     )
 
     results = []
@@ -126,7 +137,11 @@ def evaluate_random(
         steps = 0
 
         while True:
-            action, _ = model.predict(obs, deterministic=True)
+            if is_maskable:
+                action_mask = env.action_masks()
+                action, _ = model.predict(obs, deterministic=True, action_masks=action_mask)
+            else:
+                action, _ = model.predict(obs, deterministic=True)
             obs, reward, terminated, truncated, info = env.step(int(action))
             total_reward += reward
             steps += 1
