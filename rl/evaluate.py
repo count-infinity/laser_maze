@@ -23,7 +23,7 @@ from sb3_contrib import MaskablePPO
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from rl.env import LaserMazeEnv
+from rl.env import LaserMazeEnv, MaskedLaserMazeEnv
 
 
 def evaluate_on_puzzle(
@@ -40,11 +40,11 @@ def evaluate_on_puzzle(
     """
     # Check if model is MaskablePPO
     is_maskable = isinstance(model, MaskablePPO)
+    env_class = MaskedLaserMazeEnv if is_maskable else LaserMazeEnv
 
-    env = LaserMazeEnv(
+    env = env_class(
         puzzle_path=puzzle_path,
         max_steps=max_steps,
-        use_action_mask=is_maskable,
     )
 
     obs, info = env.reset()
@@ -121,12 +121,12 @@ def evaluate_random(
         Dict with aggregated statistics
     """
     is_maskable = isinstance(model, MaskablePPO)
+    env_class = MaskedLaserMazeEnv if is_maskable else LaserMazeEnv
 
-    env = LaserMazeEnv(
+    env = env_class(
         random_puzzles=True,
         puzzle_difficulty=difficulty,
         max_steps=max_steps,
-        use_action_mask=is_maskable,
     )
 
     results = []
