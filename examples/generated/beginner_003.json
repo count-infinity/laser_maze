@@ -1,0 +1,33 @@
+{
+  "grid_size": 5,
+  "pieces": [
+    {
+      "type": "target_mirror",
+      "position": [
+        3,
+        4
+      ],
+      "orientation": 3,
+      "fixed": true
+    },
+    {
+      "type": "laser",
+      "position": [
+        4,
+        1
+      ],
+      "orientation": 0,
+      "fixed": true
+    }
+  ],
+  "available": [
+    {
+      "type": "mirror",
+      "orientation": null
+    }
+  ],
+  "goal": {
+    "targets": 1,
+    "checkpoints": []
+  }
+}

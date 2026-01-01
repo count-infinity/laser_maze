@@ -1,0 +1,50 @@
+{
+  "grid_size": 5,
+  "pieces": [
+    {
+      "type": "target_mirror",
+      "position": [
+        1,
+        4
+      ],
+      "orientation": 3,
+      "fixed": true
+    },
+    {
+      "type": "laser",
+      "position": [
+        2,
+        0
+      ],
+      "orientation": 0,
+      "fixed": true
+    },
+    {
+      "type": "target_mirror",
+      "position": [
+        4,
+        1
+      ],
+      "orientation": 0,
+      "fixed": true
+    }
+  ],
+  "available": [
+    {
+      "type": "double_mirror",
+      "orientation": null
+    },
+    {
+      "type": "beam_splitter",
+      "orientation": null
+    },
+    {
+      "type": "beam_splitter",
+      "orientation": null
+    }
+  ],
+  "goal": {
+    "targets": 2,
+    "checkpoints": []
+  }
+}

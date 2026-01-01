@@ -1,0 +1,100 @@
+{
+  "grid_size": 5,
+  "pieces": [
+    {
+      "type": "cell_blocker",
+      "position": [
+        3,
+        1
+      ],
+      "orientation": 0,
+      "fixed": true
+    },
+    {
+      "type": "checkpoint",
+      "position": [
+        2,
+        1
+      ],
+      "orientation": 1,
+      "fixed": true
+    },
+    {
+      "type": "target_mirror",
+      "position": [
+        3,
+        0
+      ],
+      "orientation": 0,
+      "fixed": false,
+      "fixed_position": true
+    },
+    {
+      "type": "target_mirror",
+      "position": [
+        0,
+        4
+      ],
+      "orientation": 0,
+      "fixed": false,
+      "fixed_position": true
+    },
+    {
+      "type": "target_mirror",
+      "position": [
+        4,
+        4
+      ],
+      "orientation": 0,
+      "fixed": false,
+      "fixed_position": true
+    },
+    {
+      "type": "beam_splitter",
+      "position": [
+        3,
+        2
+      ],
+      "orientation": 0,
+      "fixed": false,
+      "fixed_position": true
+    },
+    {
+      "type": "target_mirror",
+      "position": [
+        4,
+        2
+      ],
+      "orientation": 0,
+      "fixed": false,
+      "fixed_position": true
+    }
+  ],
+  "available": [
+    {
+      "type": "laser",
+      "orientation": null
+    },
+    {
+      "type": "mirror",
+      "orientation": null
+    },
+    {
+      "type": "beam_splitter",
+      "orientation": null
+    }
+  ],
+  "goal": {
+    "target_positions": [
+      [3, 0],
+      [0, 4],
+      [4, 4]
+    ],
+    "checkpoints": [
+      [
+        2,
+        1
+      ]
+    ]
+  }
+}
