@@ -1,0 +1,18 @@
+# Core RL Libraries
+torch>=2.0.0                    # GPU-accelerated deep learning
+gymnasium>=0.29.0               # Standard RL environment interface
+stable-baselines3>=2.2.0        # Production-ready RL algorithms (PPO, SAC, etc.)
+sb3-contrib>=2.2.0              # Additional algorithms (RecurrentPPO, etc.)
+
+# Performance & Vectorization
+numpy>=1.24.0                   # Numerical operations
+numba>=0.58.0                   # JIT compilation for game logic speedup
+
+# Monitoring & Logging
+tensorboard>=2.15.0             # Training visualization
+wandb>=0.16.0                   # Experiment tracking (optional)
+
+# Development
+pytest>=7.4.0                   # Testing
+tqdm>=4.66.0                    # Progress bars
+rich>=13.0.0                    # Rich terminal output

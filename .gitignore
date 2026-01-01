@@ -47,3 +47,10 @@ CLAUDE.md
 # OS files
 .DS_Store
 Thumbs.db
+
+# RL training artifacts
+logs/
+runs/
+checkpoints/
+*.zip
+wandb/
