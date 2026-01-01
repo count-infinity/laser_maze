@@ -152,6 +152,9 @@ class CurriculumVecEnv:
     Wrapper for curriculum learning with progressive difficulty.
 
     Starts with simple puzzles and increases difficulty as agent improves.
+
+    Note: This updates the num_pieces parameter on the underlying environments
+    rather than recreating them, so the model's env reference stays valid.
     """
 
     def __init__(
@@ -161,8 +164,10 @@ class CurriculumVecEnv:
         max_pieces: int = 4,
         success_threshold: float = 0.7,
         window_size: int = 100,
+        min_episodes_per_level: int = 200,
         seed: int = 0,
         log_dir: Optional[str] = None,
+        use_action_mask: bool = False,
     ):
         """
         Initialize curriculum environment.
@@ -173,20 +178,25 @@ class CurriculumVecEnv:
             max_pieces: Maximum pieces to reach
             success_threshold: Success rate required to increase difficulty
             window_size: Episodes to consider for success rate
+            min_episodes_per_level: Minimum episodes before allowing level increase
             seed: Random seed
             log_dir: Log directory
+            use_action_mask: Use action masking for MaskablePPO
         """
         self.n_envs = n_envs
         self.current_pieces = initial_pieces
         self.max_pieces = max_pieces
         self.success_threshold = success_threshold
         self.window_size = window_size
+        self.min_episodes_per_level = min_episodes_per_level
         self.seed = seed
         self.log_dir = log_dir
+        self.use_action_mask = use_action_mask
 
         # Track success
         self._successes: List[bool] = []
         self._total_episodes = 0
+        self._episodes_at_current_level = 0
 
         # Create initial env
         self._create_env()
@@ -199,7 +209,22 @@ class CurriculumVecEnv:
             random_puzzles=True,
             seed=self.seed,
             log_dir=self.log_dir,
+            use_action_mask=self.use_action_mask,
         )
+
+    def _update_difficulty(self):
+        """Update difficulty on existing environments without recreating."""
+        # Update num_pieces on each underlying environment
+        for env in self.vec_env.envs:
+            # Handle Monitor wrapper if present
+            actual_env = env
+            while hasattr(actual_env, 'env'):
+                actual_env = actual_env.env
+            actual_env.num_pieces = self.current_pieces
+            # Map to appropriate difficulty string
+            actual_env.puzzle_difficulty = PIECES_TO_DIFFICULTY.get(
+                self.current_pieces, "expert"
+            )
 
     @property
     def success_rate(self) -> float:
@@ -213,17 +238,25 @@ class CurriculumVecEnv:
         """Record episode outcome and potentially increase difficulty."""
         self._successes.append(success)
         self._total_episodes += 1
+        self._episodes_at_current_level += 1
 
         # Check if we should increase difficulty
+        # Require BOTH:
+        # 1. Minimum episodes at current level (prevents instant jumping)
+        # 2. Full window of episodes to evaluate
+        # 3. Success rate above threshold
         if (
             self.current_pieces < self.max_pieces
+            and self._episodes_at_current_level >= self.min_episodes_per_level
             and len(self._successes) >= self.window_size
             and self.success_rate >= self.success_threshold
         ):
             self.current_pieces += 1
-            self._successes.clear()  # Reset for new difficulty
-            self._create_env()
-            print(f"Curriculum: Increased to {self.current_pieces} pieces")
+            self._successes.clear()  # Reset success tracking for new difficulty
+            self._episodes_at_current_level = 0  # Reset episode counter
+            self._update_difficulty()  # Update existing envs, don't recreate
+            print(f"Curriculum: Increased to {self.current_pieces} pieces "
+                  f"(after {self._total_episodes} total episodes)")
 
     def get_env(self):
         """Get current vectorized environment."""
